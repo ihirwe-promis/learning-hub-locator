@@ -16,11 +16,11 @@ def display_hub_details(hubs):
 
 
 def search_hub():
-    """Search for hubs by location using a partial-match query."""
-    location = input("Enter a location to search: ").strip()
+    """Search for hubs by address using a partial-match query."""
+    address = input("Enter an address to search: ").strip()
 
-    if not location:
-        print("Location cannot be empty.")
+    if not address:
+        print("Address cannot be empty.")
         return
 
     connection = None
@@ -28,12 +28,12 @@ def search_hub():
     try:
         connection = connect_database()
         cursor = connection.cursor(dictionary=True)
-        query = "SELECT * FROM hubs WHERE location LIKE %s"
-        cursor.execute(query, (f"%{location}%",))
+        query = "SELECT * FROM hubs WHERE address LIKE %s"
+        cursor.execute(query, (f"%{address}%",))
         hubs = cursor.fetchall()
 
         if not hubs:
-            print("No hubs found for that location.")
+            print("No hubs found for that address.")
             return
 
         print(f"\nFound {len(hubs)} hub(s):")

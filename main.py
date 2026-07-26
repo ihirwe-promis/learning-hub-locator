@@ -1,6 +1,7 @@
 import mysql.connector
 
 from database import connect_database
+from hub_management import add_hub, view_hubs
 
 
 def display_hub_details(hubs):
@@ -16,11 +17,11 @@ def display_hub_details(hubs):
 
 
 def search_hub():
-    """Search for hubs by location using a partial-match query."""
-    location = input("Enter a location to search: ").strip()
+    """Search for hubs by address using a partial-match query."""
+    address = input("Enter an address to search: ").strip()
 
-    if not location:
-        print("Location cannot be empty.")
+    if not address:
+        print("Address cannot be empty.")
         return
 
     connection = None
@@ -28,12 +29,12 @@ def search_hub():
     try:
         connection = connect_database()
         cursor = connection.cursor(dictionary=True)
-        query = "SELECT * FROM hubs WHERE location LIKE %s"
-        cursor.execute(query, (f"%{location}%",))
+        query = "SELECT * FROM hubs WHERE address LIKE %s"
+        cursor.execute(query, (f"%{address}%",))
         hubs = cursor.fetchall()
 
         if not hubs:
-            print("No hubs found for that location.")
+            print("No hubs found for that address.")
             return
 
         print(f"\nFound {len(hubs)} hub(s):")
@@ -61,7 +62,7 @@ def update_hub():
     try:
         connection = connect_database()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM hubs WHERE hub_id = %s", (hub_id,))
+        cursor.execute("SELECT * FROM hubs WHERE id = %s", (hub_id,))
         hub = cursor.fetchone()
 
         if not hub:
@@ -71,7 +72,7 @@ def update_hub():
         print("Current hub details:")
         display_hub_details([hub])
 
-        updatable_columns = [column for column in hub.keys() if column != "hub_id"]
+        updatable_columns = [column for column in hub.keys() if column != "id"]
         updates = []
         values = []
 
@@ -83,11 +84,6 @@ def update_hub():
             if new_value == "":
                 continue
 
-            if column.lower() == "capacity":
-                if not new_value.isdigit():
-                    print("Capacity must be a whole number.")
-                    return
-
             updates.append(f"{column} = %s")
             values.append(new_value)
 
@@ -96,7 +92,7 @@ def update_hub():
             return
 
         values.append(hub_id)
-        query = f"UPDATE hubs SET {', '.join(updates)} WHERE hub_id = %s"
+        query = f"UPDATE hubs SET {', '.join(updates)} WHERE id = %s"
         cursor.execute(query, tuple(values))
         connection.commit()
         print("Hub updated successfully.")
@@ -126,7 +122,7 @@ def delete_hub():
     try:
         connection = connect_database()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM hubs WHERE hub_id = %s", (hub_id,))
+        cursor.execute("SELECT * FROM hubs WHERE id = %s", (hub_id,))
         hub = cursor.fetchone()
 
         if not hub:
@@ -141,7 +137,7 @@ def delete_hub():
             print("Delete cancelled.")
             return
 
-        cursor.execute("DELETE FROM hubs WHERE hub_id = %s", (hub_id,))
+        cursor.execute("DELETE FROM hubs WHERE id = %s", (hub_id,))
         connection.commit()
         print("Hub deleted successfully.")
 
@@ -169,13 +165,13 @@ def menu():
         choice = input("Choose option: ").strip()
 
         if choice == "1":
-            print("Register feature is not implemented in this branch.")
+            print("Register feature is not implemented yet.")
         elif choice == "2":
-            print("Login feature is not implemented in this branch.")
+            print("Login feature is not implemented yet.")
         elif choice == "3":
-            print("Add Hub feature is not implemented in this branch.")
+            add_hub()
         elif choice == "4":
-            print("View Hubs feature is not implemented in this branch.")
+            view_hubs()
         elif choice == "5":
             search_hub()
         elif choice == "6":

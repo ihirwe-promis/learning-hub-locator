@@ -22,7 +22,3 @@ def menu():
 
 
 menu()
-
-from database import connect_database
-from hub_management import add_hub, view_hubs
-

@@ -2,6 +2,7 @@ import mysql.connector
 
 from database import connect_database
 from hub_management import add_hub, view_hubs
+from auth import register_admin, login_admin
 
 
 def display_hub_details(hubs):
@@ -150,8 +151,12 @@ def delete_hub():
 
 
 def menu():
+    logged_in_admin_id = None  # tracks which admin is currently logged in, if any
+
     while True:
-        print("""
+        status = f"Logged in as admin #{logged_in_admin_id}" if logged_in_admin_id else "Not logged in"
+        print(f"""
+[{status}]
 1. Register
 2. Login
 3. Add Hub
@@ -165,11 +170,13 @@ def menu():
         choice = input("Choose option: ").strip()
 
         if choice == "1":
-            print("Register feature is not implemented yet.")
+            register_admin()
         elif choice == "2":
-            print("Login feature is not implemented yet.")
+            admin_id = login_admin()
+            if admin_id is not None:
+                logged_in_admin_id = admin_id
         elif choice == "3":
-            add_hub()
+            add_hub(logged_in_admin_id)
         elif choice == "4":
             view_hubs()
         elif choice == "5":

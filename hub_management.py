@@ -13,11 +13,19 @@ this repo's actual setup.
 from database import connect_database
 
 
-def add_hub():
+def add_hub(admin_id=None):
     """
     Prompts the admin for hub details and inserts a new row into
     the 'hubs' table using an SQL INSERT statement.
+
+    admin_id: the id of the currently logged-in admin (from login_admin()).
+              If None, the caller hasn't logged in - we block the action
+              instead of silently using a placeholder id.
     """
+    if admin_id is None:
+        print("\nYou must be logged in as an admin to add a hub.")
+        return
+
     print("\n--- Add a New Learning Hub ---")
 
     name = input("Hub name: ").strip()
@@ -32,7 +40,7 @@ def add_hub():
         return
 
     sync_status = "unsynced"   # new local record, not yet pushed/synced
-    updated_by = 1              # placeholder: replace with logged-in admin's id once login() is wired in
+    updated_by = admin_id       # real logged-in admin's id, no more hardcoding
 
     connection = connect_database()
     cursor = connection.cursor()

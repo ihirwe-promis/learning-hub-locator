@@ -52,7 +52,7 @@ def search_hub():
 def update_hub(admin_id=None):
     """Update an existing hub after verifying that the hub ID exists."""
     if admin_id is None:
-        print("\nYou must be logged in as an admin to update a hub.")
+        print("\nNope — log in as an admin first, then you can update a hub.")
         return
 
     hub_id_input = input("Enter Hub ID to update: ").strip()
@@ -116,7 +116,7 @@ def update_hub(admin_id=None):
 def delete_hub(admin_id=None):
     """Delete an existing hub after confirmation from the user."""
     if admin_id is None:
-        print("\nYou must be logged in as an admin to delete a hub.")
+        print("\nNope — log in as an admin first, then you can delete a hub.")
         return
 
     hub_id_input = input("Enter Hub ID to delete: ").strip()
@@ -142,8 +142,11 @@ def delete_hub(admin_id=None):
         display_hub_details([hub])
 
         confirmation = input("Are you sure you want to delete this hub? (y/n): ").strip().lower()
-        if confirmation not in {"y", "yes"}:
+        if confirmation in {"n", "no"}:
             print("Delete cancelled.")
+            return
+        if confirmation not in {"y", "yes"}:
+            print("Nice try — only 'y' or 'yes' confirms a delete. Delete cancelled.")
             return
 
         cursor.execute("DELETE FROM hubs WHERE id = %s", (hub_id,))
@@ -160,6 +163,14 @@ def delete_hub(admin_id=None):
 
 def menu():
     logged_in_admin_id = None  # tracks which admin is currently logged in, if any
+
+    print("""
+==========================================
+   Welcome to the Learning Hub Locator
+   Find, manage, and grow learning hubs
+   in your community.
+==========================================
+""")
 
     while True:
         status = f"Logged in as admin #{logged_in_admin_id}" if logged_in_admin_id else "Not logged in"
@@ -194,12 +205,14 @@ def menu():
         elif choice == "7":
             delete_hub(logged_in_admin_id)
         elif choice == "8":
-            print("Thank you for using learning hub locator")
+            print("👋 Thanks for stopping by the Learning Hub Locator — see you next time!")
             break
         else:
-            print("Invalid option. Please try again.")
+            print("That's not one of the options — pick a number from 1 to 8.")
 
 
 if __name__ == "__main__":
-    menu()
-    
+    try:
+        menu()
+    except (KeyboardInterrupt, EOFError):
+        print("\n\nCaught you sneaking out early! Exiting the Learning Hub Locator.")

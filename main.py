@@ -49,8 +49,12 @@ def search_hub():
             connection.close()
 
 
-def update_hub():
+def update_hub(admin_id=None):
     """Update an existing hub after verifying that the hub ID exists."""
+    if admin_id is None:
+        print("\nYou must be logged in as an admin to update a hub.")
+        return
+
     hub_id_input = input("Enter Hub ID to update: ").strip()
 
     if not hub_id_input.isdigit():
@@ -73,7 +77,7 @@ def update_hub():
         print("Current hub details:")
         display_hub_details([hub])
 
-        updatable_columns = [column for column in hub.keys() if column != "id"]
+        updatable_columns = [column for column in hub.keys() if column not in ("id", "updated_by")]
         updates = []
         values = []
 
@@ -109,8 +113,12 @@ def update_hub():
             connection.close()
 
 
-def delete_hub():
+def delete_hub(admin_id=None):
     """Delete an existing hub after confirmation from the user."""
+    if admin_id is None:
+        print("\nYou must be logged in as an admin to delete a hub.")
+        return
+
     hub_id_input = input("Enter Hub ID to delete: ").strip()
 
     if not hub_id_input.isdigit():
@@ -182,9 +190,9 @@ def menu():
         elif choice == "5":
             search_hub()
         elif choice == "6":
-            update_hub()
+            update_hub(logged_in_admin_id)
         elif choice == "7":
-            delete_hub()
+            delete_hub(logged_in_admin_id)
         elif choice == "8":
             print("Thank you for using learning hub locator")
             break
@@ -194,3 +202,4 @@ def menu():
 
 if __name__ == "__main__":
     menu()
+    

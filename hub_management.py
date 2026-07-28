@@ -23,7 +23,7 @@ def add_hub(admin_id=None):
               instead of silently using a placeholder id.
     """
     if admin_id is None:
-        print("\nYou must be logged in as an admin to add a hub.")
+        print("\nNope — log in as an admin first, then you can add a hub.")
         return
 
     print("\n--- Add a New Learning Hub ---")
@@ -36,16 +36,18 @@ def add_hub(admin_id=None):
 
     # Basic validation - don't allow empty required fields
     if not name or not address:
-        print("Error: Hub name and address are required. Hub not added.")
+        print("Hold up — a hub needs at least a name and an address. Nothing was added.")
         return
 
     sync_status = "unsynced"   # new local record, not yet pushed/synced
     updated_by = admin_id       # real logged-in admin's id, no more hardcoding
 
-    connection = connect_database()
-    cursor = connection.cursor()
+    connection = None
 
     try:
+        connection = connect_database()
+        cursor = connection.cursor()
+
         cursor.execute(
             """
             INSERT INTO hubs (name, address, resources, hours, contact, sync_status, updated_by)
@@ -58,8 +60,8 @@ def add_hub(admin_id=None):
     except Exception as error:
         print(f"\n❌ Failed to add hub: {error}")
     finally:
-        cursor.close()
-        connection.close()
+        if connection is not None and connection.is_connected():
+            connection.close()
 
 
 def view_hubs():
@@ -67,10 +69,12 @@ def view_hubs():
     Retrieves all learning hub records from the 'hubs' table using an
     SQL SELECT statement and prints them in a readable format.
     """
-    connection = connect_database()
-    cursor = connection.cursor()
+    connection = None
 
     try:
+        connection = connect_database()
+        cursor = connection.cursor()
+
         cursor.execute("SELECT id, name, address, resources, hours, contact, sync_status FROM hubs")
         hubs = cursor.fetchall()
 
@@ -93,8 +97,8 @@ def view_hubs():
     except Exception as error:
         print(f"\n❌ Failed to retrieve hubs: {error}")
     finally:
-        cursor.close()
-        connection.close()
+        if connection is not None and connection.is_connected():
+            connection.close()
 
 
 # Manual test block - run this file directly to test your two functions
@@ -112,3 +116,4 @@ if __name__ == "__main__":
             break
         else:
             print("Invalid option, try again.")
+            

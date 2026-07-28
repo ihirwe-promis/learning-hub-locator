@@ -1,5 +1,8 @@
 # Community Learning Hub Locator
 
+## Team
+Built by our GCGO team for ALU BSE Year 1, Trimester 2.
+
 A Python command-line application that helps users locate and manage community learning hubs.
 
 ## Team Members
